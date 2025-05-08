@@ -87,5 +87,5 @@ function CodeFinnSASInit(){
     </div>
     <?php
 }
-add_shortcode("search_products", 'CodeFinnSASInit');
+add_shortcode("codefinn_search_products", 'CodeFinnSASInit');
 

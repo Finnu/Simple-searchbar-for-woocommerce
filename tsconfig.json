@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "system",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "rootDir": "./",
+    "outFile": "./searchEngine.js"
+  },
+  "include": ["templates/*.ts", "searchEngine.ts"]
+}
