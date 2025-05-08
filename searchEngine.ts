@@ -86,9 +86,10 @@ window.addEventListener("DOMContentLoaded", () =>{
                         return;
                     }
 
-                    console.log(response);
+                    //Here you can put your own logic if you wish to adjust the project or add more partials
 
                     let amount = response["data"]["amount"];
+
 
                     //@ts-ignore
                     let link = currentHost + "?s="+input.value+"&post_type=product";
@@ -98,20 +99,37 @@ window.addEventListener("DOMContentLoaded", () =>{
                     }
 
                     resultsFrame.innerHTML = "";
+                    if(amount > 0){
 
-                    resultsFrame.innerHTML += template_resultsHeader(amount);
+                        resultsFrame.innerHTML += template_resultsHeader(amount);
 
-                    for(let i = 0; i < response["data"]["products"].length; i++){
-                        let product = response["data"]["products"][i];
-                        let product_name = product["name"];
-                        let product_price = product["price"];
+                        for(let i = 0; i < response["data"]["products"].length; i++){
+                            let product = response["data"]["products"][i];
+                            let product_name = product["name"];
+                            let product_price = product["price"];
 
-                        resultsFrame.innerHTML += template_results(product_name, product_price);
+                            resultsFrame.innerHTML += template_results(product_name, product_price);
+                        }
+
+                        resultsFrame.innerHTML += template_resultsFooter(link);
                     }
-
-                    resultsFrame.innerHTML += template_resultsFooter(link);
+                    else{
+                        resultsFrame.innerHTML += template_resultsNotFound();
+                    }
                 }
             });
+        });
+
+        input.addEventListener("click", () => {
+            if(resultsFrame.classList.contains("inactive") && resultsFrame.children.length > 0){
+                resultsFrame.classList.remove("inactive");
+            }
+        });
+
+        resultsFrame.addEventListener("mouseleave", () => {
+            if(!resultsFrame.classList.contains("inactive")){
+                resultsFrame.classList.add("inactive");
+            }
         });
     }
 });

@@ -22,10 +22,10 @@
       height: auto;
       min-height: 60px;
       box-sizing: border-box;
-      &:empty{
+      &.inactive, &.inactive:empty{
         display: none;
       }
-      &.loading{
+      &.loading, &:not(.inactive){
         display: block;
       }
       &.loading:before{
@@ -38,7 +38,6 @@
         border-top-color: transparent;
         border-bottom-color: transparent;
         animation: ease-in-out rotate 1.4s infinite;
-
       }
     }
   }

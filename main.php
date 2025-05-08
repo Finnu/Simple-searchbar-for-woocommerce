@@ -36,8 +36,6 @@ class CodeFinnSAS{
 
         $products = $query->get_products();
 
-        //$amount = count($products);
-
         $max = 5;
         $found_matching = 0;
 
@@ -52,10 +50,16 @@ class CodeFinnSAS{
             if($found_matching <= $max && $match){
                 $current  = array(
                     'name' => $product->get_name(),
-                    'price' => $product->get_price(),
                     'image' => $product->get_image(),
                     'url' => $product->get_permalink()
                 );
+
+                //detect if the product is variable or simple
+                if($product->is_type('variable')){
+                    $current["price"] = wc_price($product->get_variation_price( 'min', true ));
+                }elseif($product->is_type('simple')){
+                    $current["price"] = wc_price($product->get_price());
+                }
 
                 $productId = $product->get_id();
 
@@ -126,7 +130,7 @@ function CodeFinnSASInit(){
         <?php
     }
     ?>
-    <div id="CodeFinnSAS" class="inactive"></div>
+    <div id="CodeFinnSAS"></div>
     <?php
 }
 add_shortcode("codefinn_search_products", 'CodeFinnSASInit');

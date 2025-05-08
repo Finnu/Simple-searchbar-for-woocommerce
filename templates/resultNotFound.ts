@@ -1,0 +1,1 @@
+let template_resultsNotFound = ()=> {return `<div>There are no matching records.</div>`};
