@@ -22,58 +22,101 @@ class CodeFinnSAS{
     }
 
     public static function search_products($queryString){
+        $result = array();
 
         //Limit -1 to get count of all products with specified name
         $params = array(
-          'search' => $queryString,
-          'status'  => 'publish',
-          'limit'   => -1,
+            'search' => $queryString,
+            'status'  => 'publish',
+            'limit'   => -1,
+            'return'    => 'objects'
         );
 
         $query = new WC_Product_Query($params);
 
         $products = $query->get_products();
 
-        $amount = $query->get_total();
+        //$amount = count($products);
 
-        $result = array();
+        $max = 5;
+        $found_matching = 0;
 
         foreach ($products as $product) {
+            $match = false;
 
-            $current  = array(
-                'name' => $product->get_name(),
-                'price' => $product->get_price(),
-                'image' => $product->get_image(),
-                'url' => $product->get_permalink()
-            );
+            if(strpos(strtolower($product->get_name()), strtolower($queryString))){
+                $match = true;
+                $found_matching++;
+            }
 
-            $productId = $product->get_id();
+            if($found_matching <= $max && $match){
+                $current  = array(
+                    'name' => $product->get_name(),
+                    'price' => $product->get_price(),
+                    'image' => $product->get_image(),
+                    'url' => $product->get_permalink()
+                );
 
-            //ACF support
-            if(function_exists('get_field')){
-                $config = self::load_config();
-                if(isset($config["acf"])){
-                    $fields = $config["acf"];
-                    foreach ($fields as $field){
-                        $field_value =  get_field($field, $productId);
-                        if($field_value){
-                            $current[$field] = $field_value;
+                $productId = $product->get_id();
+
+                //ACF support
+                if(function_exists('get_field')){
+                    $config = self::load_config();
+                    if(isset($config["acf"])){
+                        $fields = $config["acf"];
+                        foreach ($fields as $field){
+                            $field_value =  get_field($field, $productId);
+                            if($field_value){
+                                $current[$field] = $field_value;
+                            }
                         }
                     }
                 }
-            }
 
-            $result[] = $current;
+                $result[] = $current;
+            }
         }
 
-        return array("products" => $result, "amount" => $amount);
+        return array("products" => $result, "amount" => $found_matching);
 
     }
+}
+
+function CodeFinnSASLookupProducts(){
+    if(isset($_POST["search"])){
+        $search = sanitize_text_field($_POST["search"]);
+
+        check_ajax_referer('SASAPI_NONCE', 'nonce');
+
+        $results = array();
+
+        $results = CodeFinnSAS::search_products($search);
+
+        $response = [
+            'success' => true,
+            'data' => $results,
+            'identifier' => $search,
+            'json_last_error' => json_last_error()
+        ];
+
+        wp_send_json($response);
+    }
+}
+
+add_action('wp_ajax_GetProductsBySearchName', 'CodeFinnSASLookupProducts');
+
+
+function CodeFinnSASAPI() {
+    wp_localize_script('jquery', 'codefinn_sas_api', [
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('SASAPI_NONCE'),
+    ]);
 }
 
 function CodeFinnSASInit(){
     ?>
     <div id="CodeFinnSAS">
+        <script>let currentHost = `<?=get_site_url()?>`;</script>
         <script src="<?=plugin_dir_url(__FILE__).'searchEngine.js'?>"></script>
         <?php
             if(file_exists(__DIR__."/searchUI.css")){
@@ -88,4 +131,4 @@ function CodeFinnSASInit(){
     <?php
 }
 add_shortcode("codefinn_search_products", 'CodeFinnSASInit');
-
+add_action('wp_enqueue_scripts', 'CodeFinnSASAPI');
