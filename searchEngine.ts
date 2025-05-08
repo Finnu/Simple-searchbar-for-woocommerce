@@ -48,13 +48,31 @@ window.addEventListener("DOMContentLoaded", () =>{
 
     let currentRequestIdentifier : number = 0;
     if(input && resultsFrame && searchButton){
+
+        resultsFrame.innerHTML = "";
+
         input.addEventListener("keyup", () => {
 
-            if(input.value.length < 1)
+            if(input.value.length < 1){
+                resultsFrame.innerHTML = "";
+                if(!resultsFrame.classList.contains("inactive")){
+                    resultsFrame.classList.add("inactive");
+                }
                 return;
+            }
 
             currentRequestIdentifier = Date.now() ;
             let thisRequestIdentifier = currentRequestIdentifier;
+
+            resultsFrame.innerHTML = "";
+            if(!resultsFrame.classList.contains("loading")){
+                resultsFrame.classList.add("loading");
+            }
+
+            if(resultsFrame.classList.contains("inactive")){
+                resultsFrame.classList.remove("inactive");
+            }
+
             //@ts-ignore
             ajaxRequest(codefinn_sas_api.ajax_url, {
                 action: "GetProductsBySearchName",
@@ -73,7 +91,11 @@ window.addEventListener("DOMContentLoaded", () =>{
                     let amount = response["data"]["amount"];
 
                     //@ts-ignore
-                    let link = currentHost + "?s="+response["indetifier"]+"&post_type=product";
+                    let link = currentHost + "?s="+input.value+"&post_type=product";
+
+                    if(resultsFrame.classList.contains("loading")){
+                        resultsFrame.classList.remove("loading");
+                    }
 
                     resultsFrame.innerHTML = "";
 
@@ -88,7 +110,6 @@ window.addEventListener("DOMContentLoaded", () =>{
                     }
 
                     resultsFrame.innerHTML += template_resultsFooter(link);
-
                 }
             });
         });

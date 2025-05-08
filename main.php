@@ -115,19 +115,18 @@ function CodeFinnSASAPI() {
 
 function CodeFinnSASInit(){
     ?>
-    <div id="CodeFinnSAS">
-        <script>let currentHost = `<?=get_site_url()?>`;</script>
-        <script src="<?=plugin_dir_url(__FILE__).'searchEngine.js'?>"></script>
-        <?php
-            if(file_exists(__DIR__."/searchUI.css")){
-                ?>
-                <style>
-                    <?=file_get_contents(__DIR__."/searchUI.css")?>
-                </style>
-                <?php
-            }
+    <script>let currentHost = `<?=get_site_url()?>`;</script>
+    <script src="<?=plugin_dir_url(__FILE__).'searchEngine.js'?>"></script>
+    <?php
+    if(file_exists(__DIR__."/searchUI.css")){
         ?>
-    </div>
+        <style>
+            <?=file_get_contents(__DIR__."/searchUI.css")?>
+        </style>
+        <?php
+    }
+    ?>
+    <div id="CodeFinnSAS" class="inactive"></div>
     <?php
 }
 add_shortcode("codefinn_search_products", 'CodeFinnSASInit');
