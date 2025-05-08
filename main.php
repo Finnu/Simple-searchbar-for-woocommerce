@@ -71,9 +71,21 @@ class CodeFinnSAS{
     }
 }
 
-
-function CodefinnSASInit(){
-
+function CodeFinnSASInit(){
+    ?>
+    <div id="CodeFinnSAS">
+        <script src="<?=plugin_dir_url(__FILE__).'searchEngine.js'?>"></script>
+        <?php
+            if(file_exists(__DIR__."/searchUI.css")){
+                ?>
+                <style>
+                    <?=file_get_contents(__DIR__."/searchUI.css")?>
+                </style>
+                <?php
+            }
+        ?>
+    </div>
+    <?php
 }
-add_shortcode("search_products", 'CodefinnSASInit');
+add_shortcode("search_products", 'CodeFinnSASInit');
 
