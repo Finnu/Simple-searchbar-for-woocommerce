@@ -10,6 +10,17 @@ License: A "Slug" license name e.g. GPL2
 */
 
 class CodeFinnSAS{
+
+    private static function load_config(){
+        $path = __DIR__ . "/config.json";
+
+        if(file_exists($path)){
+            return json_decode(file_get_contents($path), true);
+        }else{
+            return array();
+        }
+    }
+
     public static function search_products($queryString){
 
         //Limit -1 to get count of all products with specified name
@@ -40,7 +51,16 @@ class CodeFinnSAS{
 
             //ACF support
             if(function_exists('get_field')){
-
+                $config = self::load_config();
+                if(isset($config["acf"])){
+                    $fields = $config["acf"];
+                    foreach ($fields as $field){
+                        $field_value =  get_field($field, $productId);
+                        if($field_value){
+                            $current[$field] = $field_value;
+                        }
+                    }
+                }
             }
 
             $result[] = $current;
