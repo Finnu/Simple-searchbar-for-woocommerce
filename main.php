@@ -36,6 +36,13 @@ class CodeFinnSAS{
                 'url' => $product->get_permalink()
             );
 
+            $productId = $product->get_id();
+
+            //ACF support
+            if(function_exists('get_field')){
+
+            }
+
             $result[] = $current;
         }
 
@@ -45,4 +52,8 @@ class CodeFinnSAS{
 }
 
 
+function CodefinnSASInit(){
+
+}
+add_shortcode("search_products", 'CodefinnSASInit');
 
