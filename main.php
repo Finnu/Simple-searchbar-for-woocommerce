@@ -22,32 +22,31 @@ class CodeFinnSAS{
     }
 
     public static function search_products($queryString){
+        global $wpdb;
+
         $result = array();
 
-        //Limit -1 to get count of all products with specified name
-        $params = array(
-            'search' => $queryString,
-            'status'  => 'publish',
-            'limit'   => -1,
-            'return'    => 'objects'
+        $sql = $wpdb->prepare(
+            "SELECT id FROM wp_posts WHERE post_type = 'product' and post_status = 'publish' and lower(post_title) LIKE concat('%', %s, '%');",
+            $queryString
         );
 
-        $query = new WC_Product_Query($params);
+        $query = $wpdb->get_results($sql);
+        $ids = array();
 
-        $products = $query->get_products();
+        foreach($query as $product){
+            $ids[] = $product->id;
+        }
+
+        $products = wc_get_products([
+                "include" => $ids,
+        ]);
 
         $max = 5;
         $found_matching = 0;
 
         foreach ($products as $product) {
-            $match = false;
-
-            if(strpos(strtolower($product->get_name()), strtolower($queryString))){
-                $match = true;
-                $found_matching++;
-            }
-
-            if($found_matching <= $max && $match){
+            if($found_matching <= $max){
                 $current  = array(
                     'name' => $product->get_name(),
                     'image' => $product->get_image(),
@@ -79,6 +78,7 @@ class CodeFinnSAS{
 
                 $result[] = $current;
             }
+            $found_matching++;
         }
 
         return array("products" => $result, "amount" => $found_matching);
@@ -87,10 +87,12 @@ class CodeFinnSAS{
 }
 
 function CodeFinnSASLookupProducts(){
-    if(isset($_POST["search"])){
-        $search = sanitize_text_field($_POST["search"]);
+    if(isset($_POST["SASLookupProducts"])){
+        $search = sanitize_text_field($_POST["SASLookupProducts"]);
 
-        check_ajax_referer('SASAPI_NONCE', 'nonce');
+        if (!check_ajax_referer('SASAPI_NONCE', 'nonce', false)) {
+            wp_send_json_error(['error' => 'Invalid nonce'], 400);
+        }
 
         $results = array();
 
@@ -102,12 +104,13 @@ function CodeFinnSASLookupProducts(){
             'identifier' => $search,
             'json_last_error' => json_last_error()
         ];
-
+        header('Content-Type: application/json');
         wp_send_json($response);
     }
 }
 
 add_action('wp_ajax_GetProductsBySearchName', 'CodeFinnSASLookupProducts');
+add_action('wp_ajax_nopriv_GetProductsBySearchName', 'CodeFinnSASLookupProducts');
 
 
 function CodeFinnSASAPI() {

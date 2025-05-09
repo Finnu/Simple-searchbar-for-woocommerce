@@ -47,12 +47,11 @@ window.addEventListener("DOMContentLoaded", () =>{
     let resultsFrame : HTMLDivElement | null = searchBarFrame.querySelector('#SASResults');
 
     let currentRequestIdentifier : number = 0;
+    let debounce_timeout : number | undefined;
+
     if(input && resultsFrame && searchButton){
 
-        resultsFrame.innerHTML = "";
-
-        input.addEventListener("keyup", () => {
-
+        let callAjaxSearch = () => {
             if(input.value.length < 1){
                 resultsFrame.innerHTML = "";
                 if(!resultsFrame.classList.contains("inactive")){
@@ -78,7 +77,7 @@ window.addEventListener("DOMContentLoaded", () =>{
                 action: "GetProductsBySearchName",
                 //@ts-ignore
                 nonce: codefinn_sas_api.nonce,
-                search: input.value
+                SASLookupProducts: input.value
             }).then((response : any) => {
                 //console.log(response);
                 if(response.success){
@@ -118,6 +117,19 @@ window.addEventListener("DOMContentLoaded", () =>{
                     }
                 }
             });
+        }
+
+        resultsFrame.innerHTML = "";
+
+        input.addEventListener("input", () => {
+            clearTimeout(debounce_timeout);
+            debounce_timeout = setTimeout(() => {
+                callAjaxSearch();
+            }, 500);
+        });
+
+        searchButton.addEventListener("click", () => {
+            callAjaxSearch();
         });
 
         input.addEventListener("click", () => {

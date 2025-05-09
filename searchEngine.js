@@ -1,6 +1,20 @@
 "use strict";
 //@ts-ignore
 let template_results = (product_name, product_price) => { return `<div><span>${product_name}</span><span>${product_price}</span></div>`; };
+//@ts-ignore
+let template_resultsFooter = (link) => { return `<div><a href="${link}">Look for more</a></div>`; };
+//@ts-ignore
+let template_resultsHeader = (amount) => { return `<div>${amount} - available <span>products</span></div>`; };
+let template_resultsNotFound = () => { return `<div>There are no matching records.</div>`; };
+let template_searchbar = `
+<div>
+    <input type="text" placeholder="Type name of a product" id="SASInput"/>
+    <button id="SASLoad">
+            <svg style="width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" /></svg>
+    </button>
+    <div id="SASResults" class="inactive"></div>
+</div>
+`;
 window.addEventListener("DOMContentLoaded", () => {
     let searchBarFrame = document.querySelector("#CodeFinnSAS");
     if (!searchBarFrame)
@@ -42,9 +56,9 @@ window.addEventListener("DOMContentLoaded", () => {
     let searchButton = searchBarFrame.querySelector('#SASLoad');
     let resultsFrame = searchBarFrame.querySelector('#SASResults');
     let currentRequestIdentifier = 0;
+    let debounce_timeout;
     if (input && resultsFrame && searchButton) {
-        resultsFrame.innerHTML = "";
-        input.addEventListener("keyup", () => {
+        let callAjaxSearch = () => {
             if (input.value.length < 1) {
                 resultsFrame.innerHTML = "";
                 if (!resultsFrame.classList.contains("inactive")) {
@@ -66,7 +80,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 action: "GetProductsBySearchName",
                 //@ts-ignore
                 nonce: codefinn_sas_api.nonce,
-                search: input.value
+                SASLookupProducts: input.value
             }).then((response) => {
                 //console.log(response);
                 if (response.success) {
@@ -96,6 +110,16 @@ window.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             });
+        };
+        resultsFrame.innerHTML = "";
+        input.addEventListener("input", () => {
+            clearTimeout(debounce_timeout);
+            debounce_timeout = setTimeout(() => {
+                callAjaxSearch();
+            }, 500);
+        });
+        searchButton.addEventListener("click", () => {
+            callAjaxSearch();
         });
         input.addEventListener("click", () => {
             if (resultsFrame.classList.contains("inactive") && resultsFrame.children.length > 0) {
@@ -109,17 +133,3 @@ window.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
-let template_searchbar = `
-<div>
-    <input type="text" placeholder="Type name of a product" id="SASInput"/>
-    <button id="SASLoad">
-            <svg style="width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" /></svg>
-    </button>
-    <div id="SASResults" class="inactive"></div>
-</div>
-`;
-//@ts-ignore
-let template_resultsHeader = (amount) => { return `<div>${amount} - available <span>products</span></div>`; };
-//@ts-ignore
-let template_resultsFooter = (link) => { return `<div><a href="${link}">Look for more</a></div>`; };
-let template_resultsNotFound = () => { return `<div>There are no matching records.</div>`; };
