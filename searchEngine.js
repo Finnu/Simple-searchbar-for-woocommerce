@@ -142,7 +142,7 @@ window.addEventListener("DOMContentLoaded", () => {
             ];
             let collection = document.querySelectorAll("#CodeFinnSAS *");
             let arrayCollection = Array.from(collection);
-            allowed.concat(arrayCollection);
+            allowed = allowed.concat(arrayCollection);
             if (!allowed.includes(e.target)) {
                 if (!resultsFrame.classList.contains("inactive")) {
                     resultsFrame.classList.add("inactive");
