@@ -104,8 +104,8 @@ window.addEventListener("DOMContentLoaded", () => {
                     if (resultsFrame.classList.contains("loading")) {
                         resultsFrame.classList.remove("loading");
                     }
-                    resultsFrame.innerHTML += template_resultsHeader(amount);
                     resultsFrame.innerHTML = "";
+                    resultsFrame.innerHTML += template_resultsHeader(amount);
                     if (amount > 0) {
                         for (let i = 0; i < response["data"]["products"].length; i++) {
                             let product = response["data"]["products"][i];
@@ -136,9 +136,17 @@ window.addEventListener("DOMContentLoaded", () => {
                 resultsFrame.classList.remove("inactive");
             }
         });
-        resultsFrame.addEventListener("mouseleave", () => {
-            if (!resultsFrame.classList.contains("inactive")) {
-                resultsFrame.classList.add("inactive");
+        window.addEventListener("click", (e) => {
+            let allowed = [
+                resultsFrame
+            ];
+            let collection = document.querySelectorAll("#CodeFinnSAS *");
+            let arrayCollection = Array.from(collection);
+            allowed.concat(arrayCollection);
+            if (!allowed.includes(e.target)) {
+                if (!resultsFrame.classList.contains("inactive")) {
+                    resultsFrame.classList.add("inactive");
+                }
             }
         });
     }

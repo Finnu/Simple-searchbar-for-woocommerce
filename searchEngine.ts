@@ -89,16 +89,16 @@ window.addEventListener("DOMContentLoaded", () =>{
 
                     let amount = response["data"]["amount"];
 
-
                     //@ts-ignore
                     let link = currentHost + "?s="+input.value+"&post_type=product";
 
                     if(resultsFrame.classList.contains("loading")){
                         resultsFrame.classList.remove("loading");
                     }
+                    resultsFrame.innerHTML = "";
+
                     resultsFrame.innerHTML += template_resultsHeader(amount);
 
-                    resultsFrame.innerHTML = "";
                     if(amount > 0){
                         for(let i = 0; i < response["data"]["products"].length; i++){
                             let product = response["data"]["products"][i];
@@ -136,9 +136,20 @@ window.addEventListener("DOMContentLoaded", () =>{
             }
         });
 
-        resultsFrame.addEventListener("mouseleave", () => {
-            if(!resultsFrame.classList.contains("inactive")){
-                resultsFrame.classList.add("inactive");
+        window.addEventListener("click", (e) => {
+            let allowed : any[] = [
+               resultsFrame
+            ];
+
+            let collection = document.querySelectorAll("#CodeFinnSAS *");
+            let arrayCollection = Array.from(collection);
+
+            allowed.concat(arrayCollection);
+
+            if(!allowed.includes(e.target)){
+                if(!resultsFrame.classList.contains("inactive")){
+                    resultsFrame.classList.add("inactive");
+                }
             }
         });
     }
