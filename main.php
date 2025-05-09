@@ -56,8 +56,10 @@ class CodeFinnSAS{
                 //detect if the product is variable or simple
                 if($product->is_type('variable')){
                     $current["price"] = wc_price($product->get_variation_price( 'min', true ));
+                    $current["type"] = "V";
                 }elseif($product->is_type('simple')){
                     $current["price"] = wc_price($product->get_price());
+                    $current["type"] = "S";
                 }
 
                 $productId = $product->get_id();

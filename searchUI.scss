@@ -1,5 +1,58 @@
 #CodeFinnSAS{
   position: relative;
+  max-width: 400px;
+  width: 100%;
+  .sas-search-record{
+    margin: 10px auto;
+    > span:last-child{
+      float: right;
+    }
+  }
+  #SASResults > div:last-child{
+    a{
+      display: block;
+      width: 100%;
+      background: #073FF4;
+      color: #FFF;
+      font-size: 17px;
+      font-weight:  700;
+      border-radius: 25px;
+      margin-top: 15px;
+      text-align: center;
+      padding: 8px 12px;
+    }
+  }
+  .available{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 3px;
+    &:before{
+      vertical-align: middle;
+      margin-right: 5px;
+      border: solid 4px #C0FFAD;
+      background: #3CFF00;
+      border-radius: 50%;
+      height: 16px;
+      width: 16px;
+      box-sizing: border-box;
+      content: '';
+    }
+    border-bottom: solid 1px rgba(0,0,0,.12);
+    padding-bottom: 15px;
+    + div{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 3px;
+      margin: 10px 0;
+      > svg{
+        margin-right: 5px;
+      }
+    }
+  }
   > div{
     button{
       background: transparent;

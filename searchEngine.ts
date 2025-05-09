@@ -96,16 +96,14 @@ window.addEventListener("DOMContentLoaded", () =>{
                     if(resultsFrame.classList.contains("loading")){
                         resultsFrame.classList.remove("loading");
                     }
+                    resultsFrame.innerHTML += template_resultsHeader(amount);
 
                     resultsFrame.innerHTML = "";
                     if(amount > 0){
-
-                        resultsFrame.innerHTML += template_resultsHeader(amount);
-
                         for(let i = 0; i < response["data"]["products"].length; i++){
                             let product = response["data"]["products"][i];
                             let product_name = product["name"];
-                            let product_price = product["price"];
+                            let product_price = (product["type"] == "V") ? "(price from "+ product["price"] + ")" : product["price"];
 
                             resultsFrame.innerHTML += template_results(product_name, product_price);
                         }
